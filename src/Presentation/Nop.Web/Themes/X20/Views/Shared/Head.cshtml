@@ -1,0 +1,45 @@
+﻿@using Nop.Core;
+@using Nop.Core.Domain
+@using Nop.Core.Infrastructure
+@using Nop.Web.Framework.Themes
+
+@{
+    var tN = EngineContext.Current.Resolve<IThemeContext>().WorkingThemeName;
+    var tP = "~/Themes/" + tN;
+    
+    Html.AddScriptParts(tP + "/Content/js/affix.js");
+    Html.AddScriptParts(tP + "/Content/js/alert.js");
+    Html.AddScriptParts(tP + "/Content/js/button.js");
+    Html.AddScriptParts(tP + "/Content/js/carousel.js");
+    Html.AddScriptParts(tP + "/Content/js/collapse.js");
+    Html.AddScriptParts(tP + "/Content/js/dropdown.js");
+    Html.AddScriptParts(tP + "/Content/js/modal.js");
+    Html.AddScriptParts(tP + "/Content/js/tooltip.js");
+    Html.AddScriptParts(tP + "/Content/js/popover.js");
+    Html.AddScriptParts(tP + "/Content/js/scrollspy.js");
+    Html.AddScriptParts(tP + "/Content/js/tab.js");
+    Html.AddScriptParts(tP + "/Content/js/transition.js");
+
+    Html.AddScriptParts(tP + "/Content/js/footable.js");
+
+    Html.AppendCssFileParts(tP + "/Content/layerslider/css/layerslider.css?v=2");
+
+    Html.AppendCssFileParts(tP + "/Content/theme/styles.min.css?v=108");
+
+    Html.AddScriptParts(tP + "/Content/waypoints/waypoints.min.js");
+
+    Html.AddScriptParts(tP + "/Content/isotope/isotope.pkgd.min.js");
+
+    Html.AddScriptParts(tP + "/Content/layerslider/js/greensock.js");
+    Html.AddScriptParts(tP + "/Content/layerslider/js/layerslider.transitions.js");
+    Html.AddScriptParts(tP + "/Content/layerslider/js/layerslider.kreaturamedia.jquery.js");
+
+    Html.AddScriptParts(tP + "/Content/bootstrap-select/js/bootstrap-select.js");
+
+    Html.AddScriptParts(tP + "/Content/bootstrap-switch/js/bootstrap-switch.js");
+    
+    Html.AddScriptParts(tP + "/Content/flexslider/jquery.flexslider.js");
+        
+    Html.AddScriptParts(ResourceLocation.Foot, tP + "/Content/theme/Scripts.js");
+    
+}

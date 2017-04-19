@@ -1,0 +1,28 @@
+﻿@model CurrencySelectorModel
+@using Nop.Web.Models.Common;
+@using Nop.Core;
+@using Nop.Core.Infrastructure;
+@if (Model.AvailableCurrencies.Count > 1)
+{
+    var webHelper = EngineContext.Current.Resolve<IWebHelper>();
+
+    if (TempData["CurrencyName"] == null)
+    {
+        TempData.Add("CurrencyName", "");
+    }
+
+    foreach (var cur in Model.AvailableCurrencies)
+    {
+        var cl = "settings-item";
+        var icon = "empty";
+        if (cur.Id == Model.CurrentCurrencyId)
+        {
+            cl += " selected";
+            icon = "ok-2";
+            TempData["CurrencyName"] = cur.Name;
+        }
+        <li><a class="@cl" href="@webHelper.ModifyQueryString(Url.RouteUrl("ChangeCurrency", new { customercurrency = cur.Id }), "returnurl=" + HttpUtility.UrlEncode(HttpContext.Current.Request.RawUrl), null)"><span class="glyphicons @icon"></span>
+            @cur.Name
+        </a></li>
+    }
+}

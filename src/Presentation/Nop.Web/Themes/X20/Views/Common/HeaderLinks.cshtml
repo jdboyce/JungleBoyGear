@@ -1,0 +1,111 @@
+﻿@model HeaderLinksModel
+@using Nop.Web.Models.Common;
+
+@if (Model.ShoppingCartEnabled)
+{
+    var active = "";
+    var items = Model.ShoppingCartItems;
+    if (items != 0)
+    {
+        active = "active highlight";
+    }
+    <li id="cartheaderbutton" class="dropdown yamm-hover @active">
+        <a href="@Url.RouteUrl("ShoppingCart")" class="brighttext carticon"><span class="cart-qty">(@items)</span><span class="glyphicons shopping-cart"></span><span class="navicontext plusmargin">@T("ShoppingCart")</span></a>
+        <div class="dropdown-menu right fadein">
+        @Html.Action("FlyoutShoppingCart", "ShoppingCart")
+        </div>
+    </li>
+}
+@if (Model.WishlistEnabled)
+{
+    string active = "";
+    var items = Model.WishlistItems;
+    if (items != 0)
+    {
+        active = "active highlight";
+    }
+    <li id="wishlistheaderbutton" class="@active">
+        <a href="@Url.RouteUrl("Wishlist")" class="brighttext carticon"><span class="wishlist-qty">(@items)</span><span class="glyphicons heart"></span><span class="navicontext plusmargin">@T("Wishlist")</span></a>
+    </li>
+}
+@{
+    var activeuser = "";
+    if(Model.IsAuthenticated)
+    {
+        activeuser = "active useronline";
+    }
+}
+<li class="dropdown yamm-hover @activeuser">
+    @{
+        string icontext1 = @T("Account.MyAccount").ToString();
+        if (Model.IsAuthenticated)
+            icontext1 = Model.CustomerEmailUsername;
+    }
+    <a href="#" class="dropdown-toggle brighttext" data-toggle="dropdown"><span class="glyphicons user"></span><span class="navicontext">@icontext1</span><span class="plussign"></span></a>
+    <ul class="dropdown-menu right fadein">
+    @Html.Action("AdminHeaderLinks", "Common")
+    @if (Model.IsAuthenticated)
+    {
+        <li><a href="@Url.RouteUrl("CustomerInfo")" class="account">@Model.CustomerEmailUsername</a></li>
+        <li><a href="@Url.RouteUrl("Logout")" class="ico-logout">@T("Account.Logout")</a></li>
+            
+        if (Model.AllowPrivateMessages)
+        {
+            <li>
+                <a href="@Url.RouteUrl("PrivateMessages", new { tab = "" })" class="ico-inbox">
+                    <span class="inbox-label">@T("PrivateMessages.Inbox")</span>
+                    <span class="inbox-unread">@Model.UnreadPrivateMessages</span>
+                </a>
+            </li>
+        }
+    }
+    else
+    {
+        <li><a href="@Url.RouteUrl("Login")" class="ico-login">@T("Account.Login")</a></li>
+        <li><a href="@Url.RouteUrl("Register")" class="ico-register">@T("Account.Register")</a></li>
+    }
+    </ul>
+</li>
+<li class="dropdown yamm-hover">
+    @{
+        var LanguageSelectorContent = @Html.Action("LanguageSelector", "Common").ToHtmlString();
+        var CurrencySelectorContent = @Html.Action("CurrencySelector", "Common").ToHtmlString();
+        var TaxTypeSelectorContent = @Html.Action("TaxTypeSelector", "Common").ToHtmlString();
+        string icontext2 = "";
+        if (TempData["LanguageName"] != null)
+            icontext2 = TempData["LanguageName"].ToString();
+        if (!string.IsNullOrEmpty(icontext2))
+            if (TempData["CurrencyName"] != null)
+                icontext2 += " / " + TempData["CurrencyName"].ToString();
+            else
+                if (TempData["CurrencyName"] != null)
+                    icontext2 = TempData["CurrencyName"].ToString();
+    }
+    <a href="#" class="dropdown-toggle brighttext" data-toggle="dropdown"><span class="glyphicons cogwheel"></span><span class="navicontext">@icontext2</span><span class="plussign"></span></a>
+    <ul class="dropdown-menu right fadein">
+        @Html.Raw(LanguageSelectorContent)
+        @if (!LanguageSelectorContent.IsEmpty() && !CurrencySelectorContent.IsEmpty())
+        {
+            <li class="divider"></li>
+        }
+        @Html.Raw(CurrencySelectorContent)
+        @if ((!LanguageSelectorContent.IsEmpty() || !CurrencySelectorContent.IsEmpty()) && !TaxTypeSelectorContent.IsEmpty())
+        {
+            <li class="divider"></li>
+        }
+        @Html.Raw(TaxTypeSelectorContent)
+    </ul>
+</li>
+
+@if (Model.AllowPrivateMessages && !string.IsNullOrEmpty(Model.AlertMessage))
+{
+    //new private message notification
+    <script type="text/javascript">
+        $(document).ready(function () {
+            displayPopupNotification('@Html.Raw(HttpUtility.JavaScriptStringEncode(Model.AlertMessage))', 'success', false);
+        });
+    </script>
+}
+
+
+

@@ -1,0 +1,197 @@
+﻿@model TopicModel
+@using Nop.Web.Models.Topics;
+@using Nop.Services.Topics;
+@using Nop.Core.Infrastructure;
+@using Nop.Core;
+
+@functions {
+    int currentCategoryId = 0;
+    int currentManufacturerId = 0;
+    int currentProductId = 0;
+    public string TopicReader(string topictext)
+    {
+        if (Model.SystemName == "_Configuration" || string.IsNullOrEmpty(topictext))
+            return topictext;
+        var found = true;
+        var count = 1;
+        while (found && count < 100)
+        {
+            int topicat = topictext.IndexOf("[TOPIC:");
+            if (topicat > -1)
+            {
+                int topicendat = topictext.IndexOf("]", topicat) + 1;
+                if (topicendat > -1)
+                {
+                    var topicstring = topictext.Substring(topicat, topicendat - topicat);
+                    var topicname = topicstring.Substring(7, topicstring.Length - 8);
+                    var tService = EngineContext.Current.Resolve<ITopicService>();
+                    var tStore = EngineContext.Current.Resolve<IStoreContext>();
+                    var topic = tService.GetTopicBySystemName(topicname, tStore.CurrentStore.Id);
+                    if (topic != null && !topic.IsPasswordProtected)
+                    {
+                        var replacewith = "<div class=\"topic-html-content\">";
+                        if (!String.IsNullOrEmpty(topic.Title))
+                        {
+                            replacewith += "<div class=\"topic-html-content-title\"><h2 class=\"topic-html-content-header\">" + 
+                                topic.Title + "</h2></div><div class=\"clear\"></div>";
+                        }
+                        replacewith += "<div class=\"topic-html-content-body\">" +
+                            topic.Body.Replace("[TOPIC:", "[NOSUBTOPIC:") + "</div></div>";
+                        topictext = topictext.Replace(topicstring, replacewith);
+                    }
+                }
+            }
+            else
+                found = false;
+            count++;
+        }
+        topictext = TopicContentReplace(topictext);
+        return topictext;
+    }
+    public string TopicContentReplace(string content)
+    {
+        var token = "[CATEGORIES]";
+        if (content.Contains(token))
+            content = content.Replace(token, Html.Action("CategoryNavigation", "Catalog", new { currentCategoryId = currentCategoryId, currentProductId = currentProductId }).ToString());
+        token = "[MANUFACTURERS]";
+        if (content.Contains(token))
+            content = content.Replace(token, Html.Action("ManufacturerNavigation", "Catalog", new { currentManufacturerId = currentManufacturerId }).ToString());
+        token = "[NEWSLETTER]";
+        if (content.Contains(token))
+            content = content.Replace(token, Html.Action("NewsletterBox", "Newsletter").ToString());
+        token = "[TAGS]";
+        if (content.Contains(token))
+            content = content.Replace(token, Html.Action("PopularProductTags", "Catalog").ToString());
+        token = "[POLL]";
+        if (content.Contains(token))
+            content = content.Replace(token, Html.Action("PollBlock", "Poll", new { systemKeyword = "LeftColumnPoll" }).ToString());
+        token = "[POLLS]";
+        if (content.Contains(token))
+            content = content.Replace(token, Html.Action("HomePagePolls", "Poll").ToString());
+        token = "[RECENTLYVIEWED]";
+        if (content.Contains(token))
+            content = content.Replace(token, Html.Action("RecentlyViewedProductsBlock", "Product", new { productThumbPictureSize = 32 }).ToString());
+        token = "[FEATURED]";
+        if (content.Contains(token))
+            content = content.Replace(token, Html.Action("HomepageProducts", "Product").ToString());
+        token = "[CATALOG]";
+        if (content.Contains(token))
+            content = content.Replace(token, Html.Action("HomepageCategories", "Catalog").ToString());
+        token = "[BESTSELLERS]";
+        if (content.Contains(token))
+            content = content.Replace(token, Html.Action("HomepageBestSellers", "Product").ToString());
+        token = "[NEWS]";
+        if (content.Contains(token))
+            content = content.Replace(token, Html.Action("HomePageNews", "News").ToString());
+        return content;
+    }
+}
+
+
+
+@{
+    var pavcrd = ViewContext.ParentActionViewContext.RouteData;
+    if (pavcrd.Values["controller"].ToString().Equals("catalog", StringComparison.InvariantCultureIgnoreCase) &&
+        pavcrd.Values["action"].ToString().Equals("category", StringComparison.InvariantCultureIgnoreCase))
+    {
+        currentCategoryId = Convert.ToInt32(pavcrd.Values["categoryId"].ToString());
+    }
+    if (pavcrd.Values["controller"].ToString().Equals("catalog", StringComparison.InvariantCultureIgnoreCase) &&
+        pavcrd.Values["action"].ToString().Equals("manufacturer", StringComparison.InvariantCultureIgnoreCase))
+    {
+        currentManufacturerId = Convert.ToInt32(pavcrd.Values["manufacturerId"].ToString());
+    }
+    if (pavcrd.Values["controller"].ToString().Equals("product", StringComparison.InvariantCultureIgnoreCase) &&
+        pavcrd.Values["action"].ToString().Equals("productdetails", StringComparison.InvariantCultureIgnoreCase))
+    {
+        currentProductId = Convert.ToInt32(pavcrd.Values["productId"].ToString());
+    }
+}
+
+
+
+
+@if (Model.IsPasswordProtected)
+{
+    <script type="text/javascript">
+        $(function () {
+            $('#button-password-@Model.Id').click(function () {
+                var topicId = $("#@Html.FieldIdFor(model => model.Id)").val();
+                var password = $('#password-@Model.Id').val();
+                $.ajax({
+                    cache: false,
+                    type: 'POST',
+                    url: '@Url.RouteUrl("TopicAuthenticate")',
+                    data: { "id": topicId, "password": password },
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.Authenticated) {
+                            $('#ph-title-@Model.Id .topic-html-content-title h2.topic-html-content-header').html(data.Title);
+                            if ($('#ph-title-@Model.Id .topic-html-content-title h2.topic-html-content-header').text().length == 0) {
+                                $('#ph-title-@Model.Id').hide();
+                            }
+                            $('#ph-topic-@Model.Id .topic-html-content-body').html(data.Body);
+                            $('#ph-password-@Model.Id').hide();
+                            $('#ph-topic-@Model.Id').show();
+                        }
+                        else {
+                            $('#password-error-@Model.Id').text(data.Error);
+                            $('#ph-password-@Model.Id #password-@Model.Id').select().focus();
+                        }
+                    }
+                });
+                return false;
+            });
+        });
+
+        $(document).ready(function () {
+            $('#ph-topic-@Model.Id').hide();
+            $('#ph-password-@Model.Id #password-@Model.Id').select().focus();
+        });
+    </script>
+    <div class="topic-password" id="ph-password-@Model.Id">
+        @using (Html.BeginRouteForm("TopicAuthenticate"))
+        {
+            @Html.HiddenFor(model => model.Id)
+            <div class="enter-password-title">
+                @T("Topic.EnterPassword")
+            </div>
+            <div class="enter-password-form">
+                @Html.Password("password", null, new { id = "password-" + @Model.Id })
+                <input type="submit" id="button-password-@Model.Id" value="@T("Topic.Button")" class="button-1 topic-password-button" />
+            </div>
+            <div class="password-error">
+                <span id="password-error-@Model.Id"></span>
+            </div>
+        }
+    </div>
+    <div class="topic-html-content" id="ph-topic-@Model.Id">
+        <div id="ph-title-@Model.Id">
+            <div class="topic-html-content-title">
+                <h2 class="topic-html-content-header">
+                    @Model.Title</h2>
+            </div>
+        </div>
+        <div class="topic-html-content-body">
+            @Html.Raw(Model.Body)
+        </div>
+    </div>
+}
+else
+{
+    <div class="topic-html-content">
+        @if (!String.IsNullOrEmpty(Model.Title))
+        {
+            <div class="topic-html-content-title">
+                <h2 class="topic-html-content-header">
+                    @Model.Title</h2>
+            </div>
+        }
+        <div class="topic-html-content-body">
+            @Html.Raw(TopicReader(Model.Body))
+        </div>
+    </div>
+}
+
+
+

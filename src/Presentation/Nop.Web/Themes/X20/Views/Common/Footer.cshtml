@@ -1,0 +1,142 @@
+﻿@model FooterModel
+@using Nop.Core
+@using Nop.Core.Domain.Tax
+@using Nop.Core.Infrastructure
+@using Nop.Web.Models.Common;
+
+<div class="master-wrapper-footer-inner container">
+    <div class="row">
+        <div class="block column information col-sm-6 col-md-3">
+            <h3>@T("Footer.Information")</h3>
+            <ul>
+                @if (Model.SitemapEnabled)
+                {
+                    <li class="aniicon"><a class="hoverpop2" href="@Url.RouteUrl("Sitemap")"><i class="glyphicons list footerinfo"></i>@T("Sitemap")</a></li>
+                }
+                <li class="aniicon"><a class="hoverpop2" href="@Url.RouteUrl("Topic", new {SeName = Html.GetTopicSeName("shippinginfo") })"><i class="glyphicons truck footerinfo"></i>@T("ShippingReturns")</a></li>
+                <li class="aniicon"><a class="hoverpop2" href="@Url.RouteUrl("Topic", new {SeName = Html.GetTopicSeName("privacyinfo") })"><i class="glyphicons lock footerinfo"></i>@T("PrivacyNotice")</a></li>
+                <li class="aniicon"><a class="hoverpop2" href="@Url.RouteUrl("Topic", new {SeName = Html.GetTopicSeName("conditionsofuse") })"><i class="glyphicons circle-info footerinfo"></i>@T("ConditionsOfUse")</a></li>
+                <li class="aniicon"><a class="hoverpop2" href="@Url.RouteUrl("Topic", new {SeName = Html.GetTopicSeName("aboutus") })"><i class="glyphicons chat footerinfo"></i>@T("AboutUs")</a></li>
+                <li class="aniicon"><a class="hoverpop2" href="@Url.RouteUrl("ContactUs")"><i class="glyphicons link footerinfo"></i>@T("ContactUs")</a></li>
+            </ul>
+            @*<p>FOO</p>*@
+        </div>
+        <div class="block column customer-service col-sm-6 col-md-3">
+            <h3>@T("Footer.CustomerService")</h3>
+            <ul>
+                <li class="aniicon"><a class="hoverpop2" href="@Url.RouteUrl("ProductSearch")"><i class="glyphicons search footerinfo"></i>@T("Search")</a> </li>
+                @if (Model.NewsEnabled)
+                {
+                    <li class="aniicon"><a class="hoverpop2" href="@Url.RouteUrl("NewsArchive")"><i class="glyphicons bullhorn footerinfo"></i>@T("News")</a></li>
+                }
+                @if (Model.BlogEnabled)
+                {
+                    <li class="aniicon"><a class="hoverpop2" href="@Url.RouteUrl("Blog")"><i class="glyphicons book footerinfo"></i>@T("Blog")</a></li>
+                }
+                @if (Model.ForumEnabled)
+                {
+                    <li class="aniicon"><a class="hoverpop2" href="@Url.RouteUrl("Boards")"><i class="glyphicons conversation footerinfo"></i>@T("Forum.Forums")</a></li>
+                }
+                @if (Model.RecentlyViewedProductsEnabled)
+                {
+                    <li class="aniicon"><a class="hoverpop2" href="@Url.RouteUrl("RecentlyViewedProducts")"><i class="glyphicons eye-open footerinfo"></i>@T("Products.RecentlyViewedProducts")</a></li>
+                }
+                @if (Model.CompareProductsEnabled)
+                {
+                    <li class="aniicon"><a class="hoverpop2" href="@Url.RouteUrl("CompareProducts")"><i class="glyphicons more-windows footerinfo"></i>@T("Products.Compare.List")</a></li>
+                }
+                @if (Model.RecentlyAddedProductsEnabled)
+                {
+                    <li class="aniicon"><a class="hoverpop2" href="@Url.RouteUrl("RecentlyAddedProducts")"><i class="glyphicons asterisk footerinfo"></i>@T("Products.NewProducts")</a></li>
+                }
+            </ul>
+        </div>
+        <div class="clearfix visible-xs visible-sm"></div>
+        <div class="block column my-account col-sm-6 col-md-3">
+            <h3>@T("Footer.MyAccount")</h3>
+            <ul>
+                <li class="aniicon"><a class="hoverpop2" href="@Url.RouteUrl("CustomerInfo")"><i class="glyphicons user footerinfo"></i>@*<span class="glyphicons user bullet1"></span> *@@T("Account.MyAccount")</a></li>
+                @if (!Model.HideOrders)
+                {
+                    <li class="aniicon"><a class="hoverpop2" href="@Url.RouteUrl("CustomerOrders")"><i class="glyphicons notes footerinfo"></i>@*<span class="glyphicons notes bullet1"></span> *@@T("Account.CustomerOrders")</a></li>
+                }
+                @if (!Model.HideAddresses)
+                {
+                    <li class="aniicon"><a class="hoverpop2" href="@Url.RouteUrl("CustomerAddresses")"><i class="glyphicons envelope footerinfo"></i>@*<span class="glyphicons envelope bullet1"></span> *@@T("Account.CustomerAddresses")</a></li>
+                }
+                @if (Model.ShoppingCartEnabled)
+                {
+                    <li class="aniicon"><a class="hoverpop2" href="@Url.RouteUrl("ShoppingCart")"><i class="glyphicons shopping-cart footerinfo"></i>@*<span class="glyphicons shopping-cart bullet1"></span> *@@T("ShoppingCart")</a></li>
+                }
+                @if (Model.WishlistEnabled)
+                {
+                    <li class="aniicon"><a class="hoverpop2" href="@Url.RouteUrl("Wishlist")"><i class="glyphicons heart footerinfo"></i>@*<span class="glyphicons heart bullet1"></span> *@@T("Wishlist")</a></li>
+                }
+            </ul>
+        </div>
+        <div class="block column follow-us col-sm-6 col-md-3">
+            <h3>@T("Footer.FollowUs")</h3>
+            <ul>
+                @if (!string.IsNullOrEmpty(Model.FacebookLink))
+                {
+                    <li class="facebook aniicon"><a class="hoverpop" href="@Model.FacebookLink" target="_blank"><span class="social facebook larger2"></span></a></li>
+                }
+                                @if (!string.IsNullOrEmpty(Model.TwitterLink))
+                {
+                    <li class="twitter aniicon"><a class="hoverpop" href="@Model.TwitterLink" target="_blank"><span class="social twitter larger2"></span></a></li>
+                }
+                                @if (Model.NewsEnabled)
+                {
+                    <li class="rss aniicon"><a class="hoverpop" href="@Url.RouteUrl("NewsRSS", new {languageId = Model.WorkingLanguageId})"><span class="social rss larger2"></span></a></li>
+                }
+                                @if (!string.IsNullOrEmpty(Model.YoutubeLink))
+                {
+                    <li class="youtube aniicon"><a class="hoverpop" href="@Model.YoutubeLink" target="_blank"><span class="social youtube larger2"></span></a></li>
+                }
+                                @if (!string.IsNullOrEmpty(Model.GooglePlusLink))
+                {
+                    <li class="google-plus aniicon"><a class="hoverpop" href="@Model.GooglePlusLink" target="_blank"><span class="social google-plus larger2"></span></a></li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="master-wrapper-footer-payment">
+    <div class="container">
+        <div class="row paymentrow">
+            <span class="postfinance aniicon"></span>
+            <span class="pw pw-paypal-new aniicon"></span>
+            <span class="pw pw-visa aniicon"></span>
+            <span class="pw pw-mastercard aniicon"></span>
+            <span class="pw pw-american-express aniicon"></span>
+            <span class="pw pw-discover aniicon"></span>
+            <span class="pw pw-maestro aniicon"></span>
+            <span class="pw pw-diners aniicon"></span>
+        </div>
+    </div>
+</div>
+<div class="master-wrapper-footer-bottom">
+    <div class="container">
+        <div class="footer row">
+            <div class="footer-poweredby">
+                Powered by <a href="http://www.nopcommerce.com/" target="_blank">nopCommerce</a> and <a href="http://www.getyournet.ch/" target="_blank">getYourNet</a>
+            </div>
+            <div class="footer-disclaimer">
+                @T("Content.CopyrightNotice", DateTime.Now.Year, Model.StoreName)
+            </div>
+            @if (Model.DisplayTaxShippingInfoFooter)
+            {
+                var inclTax = EngineContext.Current.Resolve<IWorkContext>().TaxDisplayType == TaxDisplayType.IncludingTax;
+                <div class="footer-tax-shipping">
+                    @T(inclTax ? "Footer.TaxShipping.InclTax" : "Footer.TaxShipping.ExclTax", Url.RouteUrl("Topic", new {SeName = Html.GetTopicSeName("shippinginfo")}))
+                </div>
+            }
+            <div class="footer-store-theme">
+                @Html.Action("StoreThemeSelector", "Common")
+            </div>
+            @Html.Widget("footer")
+        </div>
+    </div>
+</div>
+<div class="master-wrapper-footer-end">
+</div>

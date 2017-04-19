@@ -1,0 +1,13 @@
+﻿@{
+    Layout = "~/Views/Shared/_Root.cshtml";
+}
+@{ViewBag.Columns = 2;}
+@{ViewBag.Grid = true;}
+@if (IsSectionDefined("left"))
+{
+@section left {
+    @RenderSection("left")
+}
+}
+@RenderBody()
+    

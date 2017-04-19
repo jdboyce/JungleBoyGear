@@ -1,0 +1,151 @@
+﻿
+@model ProductModel
+
+<br />
+
+
+@*<p>
+    Product ID: @Model.Id
+</p>*@
+
+<br />
+
+<script>
+
+     window.addEventListener("message", receiveMessage, false);
+
+     function receiveMessage(event)
+     {
+         document.getElementById("searchTerm").value = event.data;
+     }
+      
+     
+
+
+</script>
+
+
+
+<div class="container">
+    <div class="row">
+        <div>
+            <br />
+            <br />
+            <p style="font-size:18px;">Product URL Address</p>
+
+            @{ var searchURL = "";
+                if (TempData["searchURL"] != null)
+                {
+                    searchURL = TempData["searchURL"].ToString();
+                }
+
+                 }
+            <input type="text" name="searchURL" id="searchURL" value ="@searchURL" style="width: 400px;
+    height: 30px;
+    padding: 10px 8px;
+    margin: 0px 0;
+    box-sizing: border-box;
+    border: 2px solid #575e68;
+    border-radius: 4px;" />
+
+
+            <input type="submit" value="&nbsp;&nbsp;Go &rarr;  " name="modifyDOM" id="modifyDOM" style="background-color: #5264ea;
+    border: none;
+    color: white;
+    padding: 6px 18px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer; border-radius: 5px;" />
+
+    
+
+        </div>
+
+@*class="col-md-2"*@
+        <div >
+            <br />
+            <p  style="font-size:18px;">Element to Track</p>
+
+
+
+            <input type="text" name="searchTerm" id="searchTerm" style="width: 400px;
+    height: 30px;
+    padding: 10px 8px;
+    margin: 0px 0;
+    box-sizing: border-box;
+    border: 2px solid #575e68;
+    border-radius: 4px;" />
+
+
+
+
+
+            <input type="submit" value="&nbsp;&nbsp;Add Monitor / Update Stock  " name="checkStock" id="checkStock" style="background-color: #19B55A;
+    border: none;
+    color: white;
+    padding: 6px 18px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer; border-radius: 5px;" />
+        </div>
+
+            <br />
+
+            <br />
+
+            
+
+            @*<form>
+                &nbsp;<input name="button3" type="button" class="submit" title="Go back one page" onclick="history.back()" value="&nbsp;&nbsp;&nbsp;&larr; Back   ">
+                &nbsp;
+
+                <input name="text" type="text" class="textbox" id="goput" style="font-size:12px; color:#0000FF; text-decoration:none;" title="Enter URL here, and click 'Go' (NOT ENTER)" onfocus="if(this.value=='http://'){this.value='http://'};" onblur="if(this.value==''){this.value='http://'};" value="http://" size="25" width="200">
+
+                &nbsp;<input name="button2" type="button" onclick="document.getElementById('crawlerBrowser').src = document.getElementById('goput').value;" value="&nbsp;&nbsp;&nbsp;Go &rarr;  " title="Do not hit enter, but rather use the Go button" class="submit">
+                @*<input name="button4" type="button" class="submit" title="Reset" onclick="document.url(start.htm)" value="Reset">*@
+            @*</form>*@
+
+
+        </div>
+</div>
+
+
+
+
+
+
+@{ 
+    var random = new Random();
+    int rand = random.Next(100000, 999999);
+
+    var iframeURL = searchURL != "" ? "Themes/X20/Content/theme/images/ModifiedDoc.html?" + rand : "Themes/X20/Content/theme/images/placeholder.html";
+
+
+}
+    <div class="row">
+        @*<iframe src="http://www.goprocut.com" style="width:100%; height:400px;"> </iframe>*@
+        <center>
+            <iframe src="~/@(iframeURL)" name="nameyouriframe" style="border:solid #575e68 5px; border-radius: 0.5em; width:95%; height:350px;" id="crawlerBrowser"></iframe>
+            
+    
+    
+    
+    @*<iframe src="~/App_Data/ModifiedDoc.html" name="nameyouriframe" style="border:solid #575e68 5px; border-radius: 0.5em; width:95%; height:400px;" id="crawlerBrowser"></iframe>*@
+
+             </center>
+    </div>
+
+    <br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />

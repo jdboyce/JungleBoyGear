@@ -1,0 +1,83 @@
+@import "fonts.less";
+@import "lesshat-prefixed.less";
+@import "animations.less";
+@import "yamm.less";
+@import "variables.less";
+
+
+//
+// Buttons
+// --------------------------------------------------
+
+// Mixins redefinition
+.button-size(@padding-vertical; @padding-horizontal; @font-size; @line-height; @border-radius) {
+  padding: @padding-vertical + 1 @padding-horizontal + 1;
+  font-size: @font-size;
+  line-height: @line-height;
+  border-radius: @border-radius;
+}
+
+// Common styles
+.btn-default,
+.btn-primary,
+.btn-success,
+.btn-info,
+.btn-warning,
+.btn-danger {
+  text-shadow: 0 -1px 0 rgba(0,0,0,.2);
+  @shadow: inset 0 1px 0 rgba(255,255,255,.15), 0 1px 1px rgba(0,0,0,.075);
+  .box-shadow(@shadow);
+
+  // Reset the shadow
+  &:active,
+  &.active {
+    .box-shadow(inset 0 3px 5px rgba(0,0,0,.125));
+  }
+
+  .badge {
+    text-shadow: none;
+  }
+}
+
+// Mixin for generating new styles
+.btn-styles(@btn-color: #555) {
+  /*#gradient > .vertical(@start-color: @btn-color; @end-color: darken(@btn-color, 5%));*/
+  #gradient > .vertical(@start-color: rgba(0, 0, 0, 0); @end-color: rgba(0, 0, 0, 0.08));
+  .reset-filter(); // Disable gradients for IE9 because filter bleeds through rounded corners
+  background-repeat: repeat-x;
+
+  &:hover,
+  &:focus  {
+    background-color: darken(@btn-color, 10%);
+  }
+
+  &:active,
+  &.active {
+    background-color: darken(@btn-color, 10%);
+  }
+
+  &:disabled,
+  &[disabled] {
+    background-color: darken(@btn-color, 10%);
+    background-image: none;
+  }
+}
+
+// Common styles
+.btn {
+  border: 0;
+  // Remove the gradient for the pressed/active state
+  &:active,
+  &.active {
+    background-image: none;
+  }
+}
+
+// Apply the mixin to the buttons
+.btn-default { .btn-styles(@btn-default-bg); text-shadow: 0 1px 0 #fff; border-color: #ccc; }
+.btn-primary { .btn-styles(@btn-primary-bg); text-shadow: none; }
+.btn-success { .btn-styles(@btn-success-bg); text-shadow: none; }
+.btn-info    { .btn-styles(@btn-info-bg); text-shadow: none; }
+.btn-warning { .btn-styles(@btn-warning-bg); text-shadow: none; }
+.btn-danger  { .btn-styles(@btn-danger-bg); text-shadow: none; }
+

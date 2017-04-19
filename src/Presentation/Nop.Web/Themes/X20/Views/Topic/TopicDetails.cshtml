@@ -1,0 +1,216 @@
+﻿@model TopicModel
+@using Nop.Core.Domain.Seo
+@using Nop.Web.Models.Topics;
+@using Nop.Services.Topics;
+@using Nop.Core.Infrastructure;
+@using Nop.Core;
+
+@functions {
+    int currentCategoryId = 0;
+    int currentManufacturerId = 0;
+    int currentProductId = 0;
+    public string TopicReader(string topictext)
+    {
+        ViewBag.TopicSystemName = Model.SystemName;
+        if (Model.SystemName == "_Configuration" || string.IsNullOrEmpty(topictext))
+            return topictext;
+        var found = true;
+        var count = 1;
+        while (found && count < 100)
+        {
+            int topicat = topictext.IndexOf("[TOPIC:");
+            if (topicat > -1)
+            {
+                int topicendat = topictext.IndexOf("]", topicat) + 1;
+                if (topicendat > -1)
+                {
+                    var topicstring = topictext.Substring(topicat, topicendat - topicat);
+                    var topicname = topicstring.Substring(7, topicstring.Length - 8);
+                    var tService = EngineContext.Current.Resolve<ITopicService>();
+                    var tStore = EngineContext.Current.Resolve<IStoreContext>();
+                    var topic = tService.GetTopicBySystemName(topicname, tStore.CurrentStore.Id);
+                    if (topic != null && !topic.IsPasswordProtected)
+                    {
+                        var replacewith = "<div class=\"topic-html-content\">";
+                        if (!String.IsNullOrEmpty(topic.Title))
+                        {
+                            replacewith += "<div class=\"topic-html-content-title\"><h2 class=\"topic-html-content-header\">" + 
+                                topic.Title + "</h2></div><div class=\"clear\"></div>";
+                        }
+                        replacewith += "<div class=\"topic-html-content-body\">" +
+                            topic.Body.Replace("[TOPIC:", "[NOSUBTOPIC:") + "</div></div>";
+                        topictext = topictext.Replace(topicstring, replacewith);
+                    }
+                }
+            }
+            else
+                found = false;
+            count++;
+        }
+        topictext = TopicContentReplace(topictext);
+        return topictext;
+    }
+    public string TopicContentReplace(string content)
+    {
+        var token = "[CATEGORIES]";
+        if (content.Contains(token))
+            content = content.Replace(token, Html.Action("CategoryNavigation", "Catalog", new { currentCategoryId = currentCategoryId, currentProductId = currentProductId }).ToString());
+        token = "[MANUFACTURERS]";
+        if (content.Contains(token))
+            content = content.Replace(token, Html.Action("ManufacturerNavigation", "Catalog", new { currentManufacturerId = currentManufacturerId }).ToString());
+        token = "[NEWSLETTER]";
+        if (content.Contains(token))
+            content = content.Replace(token, Html.Action("NewsletterBox", "Newsletter").ToString());
+        token = "[TAGS]";
+        if (content.Contains(token))
+            content = content.Replace(token, Html.Action("PopularProductTags", "Catalog").ToString());
+        token = "[POLL]";
+        if (content.Contains(token))
+            content = content.Replace(token, Html.Action("PollBlock", "Poll", new { systemKeyword = "LeftColumnPoll" }).ToString());
+        token = "[POLLS]";
+        if (content.Contains(token))
+            content = content.Replace(token, Html.Action("HomePagePolls", "Poll").ToString());
+        token = "[RECENTLYVIEWED]";
+        if (content.Contains(token))
+            content = content.Replace(token, Html.Action("RecentlyViewedProductsBlock", "Product", new { productThumbPictureSize = 32 }).ToString());
+        token = "[FEATURED]";
+        if (content.Contains(token))
+            content = content.Replace(token, Html.Action("HomepageProducts", "Product").ToString());
+        token = "[CATALOG]";
+        if (content.Contains(token))
+            content = content.Replace(token, Html.Action("HomepageCategories", "Catalog").ToString());
+        token = "[BESTSELLERS]";
+        if (content.Contains(token))
+            content = content.Replace(token, Html.Action("HomepageBestSellers", "Product").ToString());
+        token = "[NEWS]";
+        if (content.Contains(token))
+            content = content.Replace(token, Html.Action("HomePageNews", "News").ToString());
+        return content;
+    }
+}
+
+
+
+@{
+    var isPopup = ViewBag.IsPopup;
+    if (isPopup == null || isPopup == false)
+    {
+        Layout = "~/Views/Shared/_ColumnsThree.cshtml";
+    }
+    else
+    {
+        /*pop-up windows*/
+        Layout = "~/Views/Shared/_RootPopup.cshtml";
+    }
+
+    if (!Model.IsPasswordProtected)
+    {
+        Html.AddTitleParts(!String.IsNullOrEmpty(Model.MetaTitle) ? Model.MetaTitle : Model.Title);
+        Html.AddMetaDescriptionParts(Model.MetaDescription);
+        Html.AddMetaKeywordParts(Model.MetaKeywords);
+    }
+
+    var canonicalUrlsEnabled = EngineContext.Current.Resolve<SeoSettings>().CanonicalUrlsEnabled;
+    if (canonicalUrlsEnabled)
+    {
+        var topicUrl = Url.RouteUrl("Topic", new { SeName = Model.SeName }, this.Request.Url.Scheme);
+        Html.AddCanonicalUrlParts(topicUrl);
+    }
+
+    var pavcrd = ViewContext.RouteData;
+    if (pavcrd.Values["controller"].ToString().Equals("catalog", StringComparison.InvariantCultureIgnoreCase) &&
+        pavcrd.Values["action"].ToString().Equals("category", StringComparison.InvariantCultureIgnoreCase))
+    {
+        currentCategoryId = Convert.ToInt32(pavcrd.Values["categoryId"].ToString());
+    }
+    if (pavcrd.Values["controller"].ToString().Equals("catalog", StringComparison.InvariantCultureIgnoreCase) &&
+        pavcrd.Values["action"].ToString().Equals("manufacturer", StringComparison.InvariantCultureIgnoreCase))
+    {
+        currentManufacturerId = Convert.ToInt32(pavcrd.Values["manufacturerId"].ToString());
+    }
+    if (pavcrd.Values["controller"].ToString().Equals("product", StringComparison.InvariantCultureIgnoreCase) &&
+        pavcrd.Values["action"].ToString().Equals("productdetails", StringComparison.InvariantCultureIgnoreCase))
+    {
+        currentProductId = Convert.ToInt32(pavcrd.Values["productId"].ToString());
+    }
+}
+
+
+
+
+
+
+@if (Model.IsPasswordProtected)
+{
+    // For popup topics, use a minimal layout that includes the Ajax and jQuery scripts
+    if (isPopup != null && isPopup == true)
+    {
+        Layout = "~/Views/Shared/_RootPopup.cshtml";
+    }
+    
+    
+    
+    <script type="text/javascript">
+        $(function () {
+            $('#button-password').click(function () {
+                var topicId = $("#@Html.FieldIdFor(model => model.Id)").val();
+                var password = $('#password').val();
+                $.ajax({
+                    cache: false,
+                    type: 'POST',
+                    url: '@Url.RouteUrl("TopicAuthenticate")',
+                    data: { "id": topicId, "password": password },
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.Authenticated) {
+                            $('#ph-title .page-title h1').html(data.Title);
+                            if ($('#ph-title .page-title h1').text().length == 0) {
+                                $('#ph-title').hide();
+                            }
+                            $('#ph-topic .page-body').html(data.Body);
+                            $('#ph-password').hide();
+                            $('#ph-topic').show();
+                        }
+                        else {
+                            $('#password-error').text(data.Error);
+                            $('#ph-password #password').select().focus();
+                        }
+                    }
+                });
+                return false;
+            });
+        });
+
+        $(document).ready(function () {
+            $('#ph-topic').hide();
+            $('#ph-password #password').select().focus();
+        });
+    </script>
+    <div class="topic-password" id="ph-password">
+        @using (Html.BeginRouteForm("TopicAuthenticate"))
+        {
+            @Html.HiddenFor(model => model.Id)
+            <div class="enter-password-title">
+                @T("Topic.EnterPassword")
+            </div>
+            <div class="enter-password-form">
+                @Html.Password("password")
+                <input type="submit" id="button-password" value="@T("Topic.Button")" class="button-1 topic-password-button" />
+            </div>
+            <div class="password-error">
+                <span id="password-error"></span>
+            </div>
+        }
+    </div>
+}
+<div class="page topic-page" id="ph-topic">
+    <div id="ph-title">
+        <div class="page-title">
+            <h1>
+                @Model.Title</h1>
+        </div>
+    </div>
+    <div class="page-body">
+        @Html.Raw(TopicReader(Model.Body))
+    </div>
+</div>

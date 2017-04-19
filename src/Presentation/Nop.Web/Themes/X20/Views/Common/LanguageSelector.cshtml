@@ -1,0 +1,32 @@
+﻿@model LanguageSelectorModel
+@using Nop.Web.Models.Common;
+@using Nop.Core;
+@using Nop.Core.Infrastructure;
+@if (Model.AvailableLanguages.Count > 1)
+{
+    var webHelper = EngineContext.Current.Resolve<IWebHelper>();
+
+    if (TempData["LanguageName"] == null)
+    {
+        TempData.Add("LanguageName", "");
+    }
+
+    foreach (var lang in Model.AvailableLanguages)
+    {
+        var cl = "settings-item";
+        var icon = "empty";
+        if (lang.Id == Model.CurrentLanguageId)
+        {
+            cl += " selected";
+            icon = "ok-2";
+            TempData["LanguageName"] = lang.Name;
+        }
+        <li><a class="@cl" href="@webHelper.ModifyQueryString(Url.RouteUrl("ChangeLanguage", new { langid = lang.Id }), "returnurl=" + HttpUtility.UrlEncode(HttpContext.Current.Request.RawUrl), null)"><span class="glyphicons @icon"></span>
+            @if (Model.UseImages)
+            {
+                <img src="@Url.Content("~/Content/Images/flags/" + @lang.FlagImageFileName) " /> 
+            }
+            @lang.Name
+        </a></li>
+    }
+}

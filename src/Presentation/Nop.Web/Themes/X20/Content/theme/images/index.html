@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+<!-- 
+		<script>
+			$(document).ready(function(){
+			    $("button").click(function(){
+			        $("p").removeClass("highlight");
+			    });
+			});
+		</script>
+
+ -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+		 <script>
+
+			 	$(document).ready(function()
+			 								{
+			 								$("* :not('body')").mouseover(function()
+			 														  {
+			 														  	clearBorders(this);
+			 															// $(this).css("background-color", "yellow");
+			 														  });
+			    
+			   								 $("* :not('body')").mouseout(function()
+			   								 						  {
+			   								 						  	clearBorders(this);
+			   								 						  	// $(this).css("background-color", "lightgray");
+			   								 						  });
+			   								});
+
+
+
+
+			function highlight(thisElem){
+
+				$(thisElem).addClass("target");
+			}
+
+
+
+			function bounceOut(){
+				var modifiedElem = document.getElementsByClassName("target");
+
+					if(modifiedElem.length != 0)
+					{
+						var node = modifiedElem[0];
+						$(node).removeClass("target");
+					}
+			}
+
+
+			
+			function clearBorders(thisElem){
+
+					var modifiedElem = document.getElementsByClassName("target");
+
+					if(modifiedElem.length != 0)
+					{
+						var node = modifiedElem[0];
+						$(node).removeClass("target");
+						highlight(thisElem);
+					
+					}
+
+					else
+					{
+						highlight(thisElem);
+					}
+
+			}
+
+
+
+
+			function addBorder(){
+				var modifiedElem = document.getElementsByClassName("target");
+				var node = modifiedElem[0];
+				$(node).removeClass("highlight");
+			}
+
+		</script>
+
+
+
+
+
+
+		<style>
+			.border {
+				border-style: solid;
+			}
+			.target{
+				border-style: solid;
+			}
+		</style>
+
+
+
+
+
+
+	</head>
+
+
+
+
+
+	<body>
+
+		<script>
+
+
+			// function highlight(thisElem){
+
+			// 	$(thisElem).addClass("target");
+			// }
+
+
+
+			// function bounceOut(){
+			// 	var modifiedElem = document.getElementsByClassName("target");
+
+			// 		if(modifiedElem.length != 0)
+			// 		{
+			// 			var node = modifiedElem[0];
+			// 			$(node).removeClass("target");
+			// 		}
+			// }
+
+
+			
+			// function clearBorders(thisElem){
+
+			// 		var modifiedElem = document.getElementsByClassName("target");
+
+			// 		if(modifiedElem.length != 0)
+			// 		{
+			// 			var node = modifiedElem[0];
+			// 			$(node).removeClass("target");
+			// 			highlight(thisElem);
+					
+			// 		}
+
+			// 		else
+			// 		{
+			// 			highlight(thisElem);
+			// 		}
+
+			// }
+
+
+
+
+			// function addBorder(){
+			// 	var modifiedElem = document.getElementsByClassName("target");
+			// 	var node = modifiedElem[0];
+			// 	$(node).removeClass("highlight");
+			// }
+
+		</script>
+
+
+
+
+
+		<h1  >Heading</h1>
+		<br>
+
+
+
+		<iframe src="file://C:\Users\Owner\Desktop\Home\Test Site\index.html" style="width: 100%;height: 300px;"></iframe>
+		
+		<p id="head" class="highlight">This is a paragraph.</p>
+		<br>
+
+		<p onmouseover="clearBorders(this)" class="highlight">This is another paragraph.</p>
+		<br>
+
+		<p onmouseover="clearBorders(this)" class="highlight">This is yet another paragraph.</p>
+		<br>
+
+
+		<p onmouseover="clearBorders(this)" >This is yet another paragraph.</p>
+		<br>
+
+		<button onmouseover="clearBorders(this)" >Button</button>
+		<button onmouseover="clearBorders(this)"  onclick="clearBorders()">Target</button>
+
+	</body>
+
+
+
+
+
+</html>

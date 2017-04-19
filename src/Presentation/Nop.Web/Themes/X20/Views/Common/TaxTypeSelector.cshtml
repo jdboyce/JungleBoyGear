@@ -1,0 +1,30 @@
+﻿@model TaxTypeSelectorModel
+@using Nop.Core;
+@using Nop.Core.Domain.Tax;
+@using Nop.Core.Infrastructure;
+@using Nop.Web.Models.Common;
+@{
+    var webHelper = EngineContext.Current.Resolve<IWebHelper>();
+
+    var cl = "settings-item";
+    var icon = "empty";
+    if (Model.CurrentTaxType == TaxDisplayType.IncludingTax)
+    {
+        cl += " selected";
+        icon = "ok-2";
+    }
+    <li><a class="@cl" href="@webHelper.ModifyQueryString(Url.RouteUrl("ChangeTaxType", new { customertaxtype = ((int)TaxDisplayType.IncludingTax) }), "returnurl=" + HttpUtility.UrlEncode(HttpContext.Current.Request.RawUrl), null)"><span class="glyphicons @icon"></span>
+        @T("Tax.Inclusive").Text
+    </a></li>
+
+    cl = "settings-item";
+    icon = "empty";
+    if (Model.CurrentTaxType == TaxDisplayType.ExcludingTax)
+    {
+        cl += " selected";
+        icon = "ok-2";
+    }
+    <li><a class="@cl" href="@webHelper.ModifyQueryString(Url.RouteUrl("ChangeTaxType", new { customertaxtype = ((int)TaxDisplayType.ExcludingTax) }), "returnurl=" + HttpUtility.UrlEncode(HttpContext.Current.Request.RawUrl), null)"><span class="glyphicons @icon"></span>
+        @T("Tax.Exclusive").Text
+    </a></li>
+}

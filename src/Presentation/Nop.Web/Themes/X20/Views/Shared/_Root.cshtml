@@ -1,0 +1,632 @@
+﻿@{
+    Layout = "~/Views/Shared/_Root.Head.cshtml";
+}
+
+@functions {
+    public class Configuration
+    {
+        public List<MenuItem> menu;
+        public List<VerticalMenu> verticalmenu;
+        public bool nosearch;
+        public bool noverticalmenu;
+        public bool noverticaldefaultmenu;
+        public bool hideproductselectors;
+        public int columnsdefault;
+        public bool nogriddefault;
+        public bool leftnavdefault;
+        public bool disablefootertop;
+        public bool disablefooterbottom;
+        public string logo;
+        public List<string> columns1;
+        public List<string> columns2;
+        public List<string> nogrid;
+        public List<string> leftnav;
+    }
+    public class MenuItem
+    {
+        public List<string> context;
+        public List<string> contextexclude;
+        public string title;
+        public string url;
+        public bool megamenu;
+        public bool rightalign;
+        public bool active;
+        public List<MenuItem> submenu;
+        public string target;
+        public string cssclass;
+    }
+    public class VerticalMenu
+    {
+        public List<string> context;
+        public List<string> contextexclude;
+        public string title;
+        public string titleurl;
+        public bool after;
+        public bool onsystemmenu;
+        public List<MenuItem> menu;
+    }
+    public class MenuItemInfo
+    {
+        public string url;
+        public string title;
+        public string target;
+        public string active;
+    }
+    
+    int currentCategoryId = 0;
+    int currentManufacturerId = 0;
+    int currentProductId = 0;
+    Configuration config = new Configuration();
+    string controller, action, routesystemname;
+    List<object> header_topics = new List<object>();
+    string context;
+    string basename;
+    string pageinfo;
+    string logo = "/Content/Images/uploaded/logo.png";
+    void init()
+    {
+        controller = ViewContext.RouteData.Values["Controller"].ToString();
+        action = ViewContext.RouteData.Values["Action"].ToString();
+        var t1 = ViewBag.TopicSystemName;
+        if (t1 != null)
+        {
+            routesystemname = t1.ToString();
+            if (routesystemname.EndsWith("-1"))
+                ViewBag.Columns = 1;
+            if (routesystemname.EndsWith("-2"))
+                ViewBag.Columns = 2;
+        }
+        context = string.Format("{0}_{1}", controller, action);
+        basename = string.Format("_Header_{0}_{1}", controller, action);
+        pageinfo = string.Format("Page ID: {0}_{1}", controller, action);
+        if (!string.IsNullOrEmpty(routesystemname))
+        {
+            context = string.Format("{0}_{1}", context, routesystemname);
+            basename = string.Format("{0}_{1}", basename, routesystemname);
+            pageinfo = string.Format("{0}_{1}", pageinfo, routesystemname);
+        }
+        if (ViewBag.RightNav == null)
+            ViewBag.RightNav = true;
+        if (config != null)
+        {
+            if (config.columnsdefault > 0 && config.columnsdefault <= 2)
+                ViewBag.Columns = config.columnsdefault;
+            if (config.columns1 != null && config.columns1.Contains(context))
+                ViewBag.Columns = 1;
+            if (config.columns2 != null && config.columns2.Contains(context))
+                ViewBag.Columns = 2;
+
+            if (ViewBag.Grid == null)
+                ViewBag.Grid = true;
+            if (config.nogriddefault)
+                ViewBag.Grid = false;
+            if (config.nogrid != null && config.nogrid.Contains(context))
+                ViewBag.Grid = false;
+
+            if (config.leftnavdefault)
+                ViewBag.RightNav = false;
+            if (config.leftnav != null && config.leftnav.Contains(context))
+                ViewBag.RightNav = false;
+
+            if (config.logo != null)
+                logo = config.logo;
+        }
+    }
+    bool getTopic(int index, bool Default = false)
+    {
+        var systemname = string.Format("{0}_{1}", basename, index);
+        if (Default)
+        {
+            systemname = string.Format("_Header_{0}", index);
+        }
+        var topic = TopicReader("[TOPIC:" + systemname + "]");
+        if (topic.ToString().Length > 0)
+        {
+            header_topics.Add(topic);
+            return true;
+        }
+        return false;
+    }
+    void getTopics()
+    {
+        getTopic(1); getTopic(2); getTopic(3); getTopic(4);
+        if (header_topics.Count == 0)
+        {
+            getTopic(1, true); getTopic(2, true); getTopic(3, true); getTopic(4, true);
+        }
+    }
+    public static string StripTagsCharArray(string source)
+    {
+        char[] array = new char[source.Length];
+        int arrayIndex = 0;
+        bool inside = false;
+
+        for (int i = 0; i < source.Length; i++)
+        {
+            char let = source[i];
+            if (let == '<')
+            {
+                inside = true;
+                continue;
+            }
+            if (let == '>')
+            {
+                inside = false;
+                continue;
+            }
+            if (!inside)
+            {
+                array[arrayIndex] = let;
+                arrayIndex++;
+            }
+        }
+        return new string(array, 0, arrayIndex);
+    }
+    public string TopicReader(string systemname, bool first = true)
+    {
+        return Html.Action("TopicBlock", "Topic", new { systemName = systemname.Substring(7, systemname.Length - 8) }).ToString();
+    }
+    bool isVerticalMenuContext(VerticalMenu menublock)
+    {
+        var ret = false;
+        if (menublock.menu != null && menublock.menu.Count > 0)
+        {
+            if (menublock.context == null || menublock.context.Count == 0)
+            {
+                if (menublock.contextexclude == null || menublock.contextexclude.Count == 0)
+                {
+                    ret = true;
+                }
+                else
+                {
+                    ret = !menublock.contextexclude.Contains(context);
+                }
+            }
+            else
+            {
+                ret = menublock.context.Contains(context);
+            }
+        }
+        return ret;
+    }
+    bool isMenuContext(MenuItem menuitem)
+    {
+        var ret = false;
+        if (menuitem.context == null || menuitem.context.Count == 0)
+        {
+            if (menuitem.contextexclude == null || menuitem.contextexclude.Count == 0)
+            {
+                ret = true;
+            }
+            else
+            {
+                ret = !menuitem.contextexclude.Contains(context);
+            }
+        }
+        else
+        {
+            ret = menuitem.context.Contains(context);
+        }
+        return ret;
+    }
+    bool isInPath(string url)
+    {
+        return url != null && url.StartsWith("/") && url.EndsWith(Request.Url.AbsolutePath);
+    }
+    MenuItemInfo GetMenuItemInfo(MenuItem mitem)
+    {
+        var minfo = new MenuItemInfo();
+        minfo.target = "_self";
+        if (mitem.title == "[HOMEPAGE]")
+        {
+            minfo.url = Url.RouteUrl("HomePage");
+            minfo.title = T("HomePage").ToString();
+        }
+        else if (mitem.title == "[NEWPRODUCTS]")
+        {
+            minfo.url = Url.RouteUrl("RecentlyAddedProducts");
+            minfo.title = T("Products.NewProducts").ToString();
+        }
+        else if (mitem.title == "[BLOG]")
+        {
+            minfo.url = Url.RouteUrl("Blog");
+            minfo.title = T("Blog").ToString();
+        }
+        else if (mitem.title == "[FORUM]")
+        {
+            minfo.url = Url.RouteUrl("Boards");
+            minfo.title = T("Forum.Forums").ToString();
+        }
+        else if (mitem.title == "[MYACCOUNT]")
+        {
+            minfo.url = Url.RouteUrl("CustomerInfo");
+            minfo.title = T("Account.MyAccount").ToString();
+        }
+        else if (mitem.title == "[CONTACTUS]")
+        {
+            minfo.url = Url.RouteUrl("ContactUs");
+            minfo.title = T("ContactUs").ToString();
+        }
+        else
+        {
+            minfo.url = mitem.url;
+            minfo.title = mitem.title;
+            minfo.target = mitem.target;
+        }
+        minfo.active = isInPath(minfo.url) || mitem.active ? "active" : "";
+        return minfo;
+    }
+}
+
+@{
+    if (Url.RequestContext.RouteData.Values["controller"].ToString().Equals("catalog", StringComparison.InvariantCultureIgnoreCase) &&
+        Url.RequestContext.RouteData.Values["action"].ToString().Equals("category", StringComparison.InvariantCultureIgnoreCase))
+    {
+        currentCategoryId = Convert.ToInt32(Url.RequestContext.RouteData.Values["categoryId"].ToString());
+    }
+    if (Url.RequestContext.RouteData.Values["controller"].ToString().Equals("catalog", StringComparison.InvariantCultureIgnoreCase) &&
+        Url.RequestContext.RouteData.Values["action"].ToString().Equals("manufacturer", StringComparison.InvariantCultureIgnoreCase))
+    {
+        currentManufacturerId = Convert.ToInt32(Url.RequestContext.RouteData.Values["manufacturerId"].ToString());
+    }
+    if (Url.RequestContext.RouteData.Values["controller"].ToString().Equals("product", StringComparison.InvariantCultureIgnoreCase) &&
+        Url.RequestContext.RouteData.Values["action"].ToString().Equals("productdetails", StringComparison.InvariantCultureIgnoreCase))
+    {
+        currentProductId = Convert.ToInt32(Url.RequestContext.RouteData.Values["productId"].ToString());
+    }
+
+
+    var configjsonstring = StripTagsCharArray(Html.Action("TopicBlock", "Topic", new { systemName = "_Configuration" }).ToString());
+    configjsonstring = configjsonstring.Replace("&nbsp;", "");
+    try
+    {
+        config = Json.Decode<Configuration>(configjsonstring);
+        ViewBag.Configuration = config;
+    }
+    catch { }
+
+    var roles = WorkContext.CurrentCustomer.CustomerRoles.Where(x => x.Active && x.Name == "Administrators");
+
+    init();
+
+    getTopics();
+}
+
+
+@Html.Widget("body_start_html_tag_after")
+@Html.Partial("_Notifications")
+<div class="master-wrapper-page @(ViewBag.Grid ? "" : "nogrid")">
+    @Html.Action("JavaScriptDisabledWarning", "Common")
+
+    <script type="text/javascript">
+        AjaxCart.init(false, '.cart-qty', '.wishlist-qty', '#flyout-cart');
+        var ThemeXConfiguration = @Html.Raw(Json.Encode(config));
+    </script>
+
+    <!-- Fixed navbar -->
+    <div class="navbar navbar-default navbar-fixed-top yamm" role="navigation">
+      <div class="navbarinner">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand startstyles" href="/"><img src="@logo" /></a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+
+
+    @if (config != null)
+    {
+        if (config.menu != null && config.menu.Count > 0)
+        {
+            foreach (var menuitem in config.menu)
+            {
+                if (isMenuContext(menuitem))
+                {
+                    var li_class = "";
+                    var a_str = "";
+                    var ddicon = "";
+                    if (menuitem.submenu != null && menuitem.submenu.Count > 0)
+                    {
+                        li_class += "dropdown yamm-hover";
+                        if (menuitem.megamenu)
+                        {
+                            li_class += " yamm-fw";
+                        }
+                        a_str = "class=dropdown-toggle data-toggle=dropdown";
+                        ddicon = "<span class='plussign'></span>";
+                    }
+                    if (menuitem.active)
+                    {
+                        li_class += " active";
+                    }
+                    if (menuitem.cssclass != null)
+                    {
+                        li_class += " " + menuitem.cssclass;
+                    }
+                    var minforoot = GetMenuItemInfo(menuitem);
+                    li_class += " " + minforoot.active;
+                    <li class="@li_class">
+                        <a target="@(minforoot.target)" href="@Html.Raw(minforoot.url)" @a_str>@Html.Raw(minforoot.title)@Html.Raw(ddicon)</a>
+                        @if (menuitem.submenu != null && menuitem.submenu.Count > 0)
+                        {
+                            var rightalign = "";
+                            if (menuitem.rightalign)
+                            {
+                                rightalign = "right";
+                            }
+                            if (menuitem.submenu[0].title == "[CATEGORIES]")
+                            {
+                                <div class="dropdown-menu @rightalign fadein">
+                                    @Html.Action("CategoryNavigation", "Catalog", new { currentCategoryId = currentCategoryId, currentProductId = currentProductId })
+                                </div>
+                            }
+                            else if (menuitem.submenu[0].title.StartsWith("[TOPIC:"))
+                            {
+                                <ul class="dropdown-menu @rightalign fadein">
+                                    <li>@Html.Raw(TopicReader(menuitem.submenu[0].title))</li>
+                                </ul>
+                            }
+                            else
+                            {
+                                <ul class="dropdown-menu @rightalign fadein">
+                                    @foreach (var submenuitem in menuitem.submenu)
+                                    {
+                                        if (isMenuContext(submenuitem))
+                                        {
+                                            var minfo = GetMenuItemInfo(submenuitem);
+                                            <li class="@minfo.active">
+                                                <a target="@(minfo.target)" href="@Html.Raw(minfo.url)">@Html.Raw(minfo.title)</a>
+                                            </li>
+                                        }
+                                    }
+                                </ul>
+                            }
+                        }
+                    </li>
+                }
+            }
+        }
+    }
+    else
+    {
+        <li class="dropdown yamm-hover">
+            <a href="/" class="dropdown-toggle" data-toggle="dropdown">@T("Categories")<span class='plussign'></span></a>
+            <div class="dropdown-menu fadein">
+                @Html.Action("CategoryNavigation", "Catalog", new { currentCategoryId = currentCategoryId, currentProductId = currentProductId })
+            </div>
+        </li>
+    }
+    
+            @if (config == null || !config.nosearch)
+            {
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle brighttext" data-toggle="dropdown"><span class="glyphicons search"></span><span class="navicontext">@T("Search.SearchBox.Tooltip")</span><span class="plussign"></span></a>
+                  <ul class="dropdown-menu right anipopup1 search-box-outer ui-front">
+                      @Html.Action("SearchBox", "Catalog")
+                  </ul>
+                </li>
+            }
+            @Html.Action("HeaderLinks", "Common")
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+      </div>
+    </div>
+
+
+    @foreach (var topic in header_topics)
+    {
+        @Html.Raw(topic)
+    }
+    @if (roles.Count() > 0)
+    {
+        <div class="pageidinfo">
+            @pageinfo
+        </div>
+    }
+
+    @Html.Widget("content_before")
+    @*ajax loading window*@
+    <div class="ajax-loading-block-window" style="display: none">
+        <div class="loading-image">
+        </div>
+    </div>
+
+    @if (ViewBag.Columns == 1 && ViewBag.Grid == true)
+    {
+        <div class="master-wrapper-content">
+            <div class="master-wrapper-content-container container">
+                <div class="row">
+                    <div class="col-xs-12">
+                        @Html.Widget("main_column_before")
+                        @RenderBody()
+                        @Html.Widget("main_column_after")
+                    </div>
+                </div>
+            </div>
+        </div>
+        if (IsSectionDefined("left"))
+        {
+            @RenderSection("left").ToString().Remove(0)
+        }
+    }
+    else if (ViewBag.Columns == 1 && ViewBag.Grid == false)
+    {
+        @Html.Widget("main_column_before")
+        @RenderBody()
+        @Html.Widget("main_column_after")
+        if (IsSectionDefined("left"))
+        {
+            @RenderSection("left").ToString().Remove(0)
+        }
+    }
+    else if (ViewBag.Columns == 2)
+    {
+        string navcolgridclass = "col-md-4";
+        string navcolclass = "navcolumn-left";
+        string contentcolgridclass = "col-md-8";
+        if (ViewBag.RightNav == true)
+        {
+            navcolgridclass = "col-md-4 col-md-push-8";
+            navcolclass = "navcolumn-right";
+            contentcolgridclass = "col-md-8 col-md-pull-4";
+        }
+        
+@helper VerticalCustomNav(bool after, bool onsystemmenu)
+{
+    if (config != null && config.verticalmenu != null && config.verticalmenu.Count > 0)
+    {
+        foreach (var menublock in config.verticalmenu)
+        {
+            if (isVerticalMenuContext(menublock) && menublock.after == after && (!onsystemmenu || menublock.onsystemmenu))
+            {
+                <div class="block block-category-navigation">
+                    @if (!string.IsNullOrEmpty(menublock.title))
+                    {
+                        <div class="title">
+                            @if (!string.IsNullOrEmpty(menublock.titleurl))
+                            {
+                                <a href="@(menublock.titleurl)"><strong>@(menublock.title)</strong></a>
+                            }
+                            else
+                            {
+                                <strong>@(menublock.title)</strong>
+                            }
+                        </div>
+                    }
+                    <div class="listbox">
+                        <ul class="list">
+                            @foreach (var menuitem in menublock.menu)
+                            {
+                                if (isMenuContext(menuitem))
+                                {
+                                    string active = isInPath(menuitem.url) || menuitem.active ? "active" : "";
+                                    <li class="@active">
+                                        <a target="@(menuitem.target)" href="@Html.Raw(menuitem.url)">@Html.Raw(menuitem.title)</a>
+                                        @if (menuitem.submenu != null && menuitem.submenu.Count > 0)
+                                        {
+                                            <ul class="sublist">
+                                                @foreach (var submenuitem in menuitem.submenu)
+                                                {
+                                                    if (isMenuContext(submenuitem))
+                                                    {
+                                                        string active2 = isInPath(submenuitem.url) || submenuitem.active ? "active" : "";
+                                                        <li class="@active2">
+                                                                <a target="@(submenuitem.target)" href="@Html.Raw(submenuitem.url)">@Html.Raw(submenuitem.title)</a>
+                                                        </li>
+                                                    }
+                                                }
+                                            </ul>
+                                        }
+                                    </li>
+                                }
+                            }
+                        </ul>
+                    </div>
+                </div>
+            }
+        }
+    }
+}      
+        
+<div class="master-wrapper-content">
+    <div class="master-wrapper-content-container container">
+        <div class="row">
+            <div class="@navcolgridclass">
+                @{
+        string addclass = "";
+        if (IsSectionDefined("left"))
+        {
+            addclass = "importantright";
+        }
+                }
+                <div class="@navcolclass @addclass">
+                @Html.Action("TopicBlock", "Topic", new { systemName = "RightColumnBefore_" + context })
+                @Html.Action("TopicBlock", "Topic", new { systemName = "RightColumnBefore" })
+                @Html.Widget("left_side_column_before")
+                @if (IsSectionDefined("left"))
+                {
+                    @VerticalCustomNav(false, true)
+                    @RenderSection("left")
+                    @VerticalCustomNav(true, true)
+                }
+                else
+                {
+                    if (config == null || (config != null && !config.noverticalmenu))
+                    {
+                        @VerticalCustomNav(false, false)
+                        if (config == null || (config != null && !config.noverticaldefaultmenu))
+                        {
+                            @Html.Action("CategoryNavigation", "Catalog", new { currentCategoryId = currentCategoryId, currentProductId = currentProductId })
+                            @Html.Widget("left_side_column_after_category_navigation")
+                            @Html.Action("ManufacturerNavigation", "Catalog", new { currentManufacturerId = currentManufacturerId })        
+                            @Html.Action("VendorNavigation", "Catalog")
+                        }
+                        @VerticalCustomNav(true, false)
+                    }
+                }
+                @Html.Widget("left_side_column_after")
+                @Html.Action("TopicBlock", "Topic", new { systemName = "RightColumnAfter" })
+                @Html.Action("TopicBlock", "Topic", new { systemName = "RightColumnAfter_" + context })
+                </div>
+            </div>
+            <div class="@contentcolgridclass">
+                @Html.Widget("main_column_before")
+                @RenderBody()
+                @Html.Widget("main_column_after")
+            </div>
+        </div>
+    </div>
+</div>
+    }
+    else
+    {
+        @RenderBody()
+        if (IsSectionDefined("left"))
+        {
+            @RenderSection("left").ToString().Remove(0)
+        }
+    }
+    @Html.Widget("content_after")
+
+    @if (config == null || (config != null && !config.disablefootertop))
+    {
+        <div class="master-wrapper-footer-top">
+            <div class="master-wrapper-footer-top-inner container">
+                <div class="row isotoperow">
+                    @Html.Action("PopularProductTags", "Catalog")
+                    @Html.Action("RecentlyViewedProductsBlock", "Product", new { productThumbPictureSize = 64 })        
+                    <div class="isotopeitem"><div class="block-topicon aniicon"><div><span class="glyphicons bullhorn"></span></div></div>
+                        @Html.Action("NewsletterBox", "Newsletter")
+                    </div>
+                    @{
+        string pollcontent = Html.Action("PollBlock", "Poll", new { systemKeyword = "RightColumnPoll" }).ToString();
+        if (!string.IsNullOrEmpty(pollcontent))
+        {
+                            <div class="isotopeitem"><div class="block-topicon aniicon"><div><span class="glyphicons conversation"></span></div></div>
+                                @Html.Raw(pollcontent)
+                            </div>
+        }
+                    }
+                </div>
+            </div>
+        </div>
+    }
+    @if (config == null || (config != null && !config.disablefooterbottom))
+    {
+        <div class="master-wrapper-footer">
+            @Html.Action("Footer", "Common")
+        </div>
+    }
+    @Html.Action("TopicBlock", "Topic", new { systemName = "CustomFooter" })
+</div>
+@Html.Action("EuCookieLaw", "Common")
+@Html.Widget("body_end_html_tag_before")
+
+<a href='#top' id='scroll-top-link'><span class="glyphicons rotate90 chevron-left"></span></a>
