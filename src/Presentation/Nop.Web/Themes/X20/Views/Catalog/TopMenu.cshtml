@@ -5,6 +5,7 @@
 }
 @helper RenderCategoryLine(CategorySimpleModel category, int level)
 {
+    <p>hi</p>
     <li>
         <a href="@Url.RouteUrl("Category", new { SeName = category.SeName })">@category.Name
         @if (category.NumberOfProducts.HasValue)

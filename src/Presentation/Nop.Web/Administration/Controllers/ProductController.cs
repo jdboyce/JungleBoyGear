@@ -1108,7 +1108,10 @@ namespace Nop.Admin.Controllers
                 //var prod = _productService.GetProductById(1);
 
 
-                if (searchURL != null && searchTerm != null)
+       
+
+
+                if (searchURL.Length > 1 && searchTerm.Length > 1)
                 {
                     Crawler crawler = new Crawler(searchTerm, searchURL);
 
@@ -1123,6 +1126,10 @@ namespace Nop.Admin.Controllers
                         product.Published = true;
                     }
                 }
+
+
+
+
 
                 _productService.UpdateProduct(product);
                 _productService.UpdateHasDiscountsApplied(product);

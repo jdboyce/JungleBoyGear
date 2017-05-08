@@ -333,6 +333,7 @@ namespace Nop.Web.Controllers
                 {
                     Id = category.Id,
                     Name = category.GetLocalized(x => x.Name),
+                    //Name = "PRODUCTS",
                     SeName = category.GetSeName()
                 };
 
@@ -662,6 +663,22 @@ namespace Nop.Web.Controllers
 
             return PartialView(model);
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         [ChildActionOnly]
         public ActionResult TopMenu()

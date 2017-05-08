@@ -170,6 +170,7 @@
             <div class="topic-html-content-title">
                 <h2 class="topic-html-content-header">
                     @Model.Title</h2>
+                
             </div>
         </div>
         <div class="topic-html-content-body">
@@ -179,12 +180,17 @@
 }
 else
 {
+
+    @*bookmark*@
     <div class="topic-html-content">
         @if (!String.IsNullOrEmpty(Model.Title))
         {
             <div class="topic-html-content-title">
-                <h2 class="topic-html-content-header">
-                    @Model.Title</h2>
+                <h2 class="topic-html-content-header">Welcome to Jungle Boy Gear
+                   @* @Model.Title*@
+                
+                </h2>
+
             </div>
         }
         <div class="topic-html-content-body">
@@ -192,6 +198,5 @@ else
         </div>
     </div>
 }
-
-
+                                                              
 

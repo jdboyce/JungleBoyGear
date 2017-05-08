@@ -27,6 +27,7 @@ namespace Nop.Web.Extensions
             {
                 Id = entity.Id,
                 Name = entity.GetLocalized(x => x.Name),
+                //Name = "Products",
                 Description = entity.GetLocalized(x => x.Description),
                 MetaKeywords = entity.GetLocalized(x => x.MetaKeywords),
                 MetaDescription = entity.GetLocalized(x => x.MetaDescription),
