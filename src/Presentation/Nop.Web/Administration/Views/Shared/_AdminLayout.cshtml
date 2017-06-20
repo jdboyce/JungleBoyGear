@@ -11,8 +11,8 @@
     var kendoVersion = "2014.1.318";
     var supportRtl = EngineContext.Current.Resolve<IWorkContext>().WorkingLanguage.Rtl &&
         !EngineContext.Current.Resolve<LocalizationSettings>().IgnoreRtlPropertyForAdminArea;
-        
-        
+
+
     //CSS resources
     Html.AppendCssFileParts(string.Format("~/Content/kendo/{0}/kendo.rtl.min.css", kendoVersion));
     Html.AppendCssFileParts(string.Format("~/Content/kendo/{0}/kendo.default.min.css", kendoVersion));
@@ -41,11 +41,12 @@
     {
         adminPageTitle = ViewBag.Title + " / ";
     }
-    adminPageTitle += T("Admin.PageTitle").Text;
+    //adminPageTitle += T("Admin.PageTitle").Text;
+    adminPageTitle += "Admin";
 
     //has "Manage Maintenance" permission?
     var canManageMaintenance = EngineContext.Current.Resolve<IPermissionService>()
-        .Authorize(StandardPermissionProvider.ManageMaintenance);
+.Authorize(StandardPermissionProvider.ManageMaintenance);
 
     //X-UA-Compatible tag
     var commonSettings = EngineContext.Current.Resolve<CommonSettings>();
@@ -86,12 +87,15 @@
                         <div class="logo">
                         </div>
                         @Html.Widget("admin_header_before")
+                     
                         <div class="languageselector">
                             @Html.Action("LanguageSelector", "Common")
                         </div>
+                  
                         @Html.Widget("admin_header_middle")
-                        <div class="links">
-                            @Html.ActionLink(T("Admin.Header.PublicStore").Text, "Index", "Home", new { area = "" }, null)
+                        <div class="links" style="padding-top:1em;">@*#4a77ce*@
+                            @*T("Admin.Header.PublicStore").Text*@
+                            @Html.ActionLink("Public Store", "Index", "Home", new { area = "" }, null)
                             @if (canManageMaintenance)
                             {
                                 @*<span class="separator">|</span>
@@ -101,10 +105,11 @@
                             }
                         </div>
                         <div class="login-info">
+                        
                             @if (currentCustomer != null && currentCustomer.IsRegistered())
                             {
-                                @String.Format(T("Admin.Header.LoggedInAs").Text, usernamesEnabled ? currentCustomer.Username : currentCustomer.Email)
-                                <text>, </text> @Html.ActionLink(T("Admin.Header.Logout").Text, "Logout", "Customer", new { area = "" }, null)
+                                @String.Format(T("Admin.Header.LoggedInAs").Text, usernamesEnabled ? currentCustomer.Username : currentCustomer.Email )
+                                <text> &nbsp;&nbsp;|&nbsp;&nbsp; </text> @Html.ActionLink("Logout ", "Logout", "Customer", new { area = "" }, null)@*T("Admin.Header.Logout").Text*@
                             }
                         </div>
                         @*<div class="version">

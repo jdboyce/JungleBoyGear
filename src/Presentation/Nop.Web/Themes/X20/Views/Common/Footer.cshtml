@@ -19,7 +19,7 @@
                 <li class="aniicon"><a class="hoverpop2" href="@Url.RouteUrl("Topic", new {SeName = Html.GetTopicSeName("aboutus") })"><i class="glyphicons chat footerinfo"></i>@T("AboutUs")</a></li>
                 <li class="aniicon"><a class="hoverpop2" href="@Url.RouteUrl("ContactUs")"><i class="glyphicons link footerinfo"></i>@T("ContactUs")</a></li>
             </ul>
-            @*<p>FOO</p>*@
+          
         </div>
         <div class="block column customer-service col-sm-6 col-md-3">
             <h3>@T("Footer.CustomerService")</h3>
@@ -104,27 +104,30 @@
 <div class="master-wrapper-footer-payment">
     <div class="container">
         <div class="row paymentrow">
-            <span class="postfinance aniicon"></span>
+            @*<span class="postfinance aniicon"></span>*@
             <span class="pw pw-paypal-new aniicon"></span>
             <span class="pw pw-visa aniicon"></span>
             <span class="pw pw-mastercard aniicon"></span>
             <span class="pw pw-american-express aniicon"></span>
             <span class="pw pw-discover aniicon"></span>
-            <span class="pw pw-maestro aniicon"></span>
-            <span class="pw pw-diners aniicon"></span>
-        </div>
-    </div>
+            @*<span class="pw pw-maestro aniicon"></span>*@
+            @*<span class="pw pw-diners aniicon"></span>*@
+        </div> <center><p>Copyright © 2017 &nbsp; | &nbsp; Jungle Boy Gear &nbsp; | &nbsp; All rights reserved.</p></center>
+    </div><br />
 </div>
+
 <div class="master-wrapper-footer-bottom">
     <div class="container">
         <div class="footer row">
+            <br />
+            <br />
             <div class="footer-poweredby">
-                Powered by <a href="http://www.nopcommerce.com/" target="_blank">nopCommerce</a> and <a href="http://www.getyournet.ch/" target="_blank">getYourNet</a>
+                Powered by <a href="http://www.nopcommerce.com/" target="_blank">nopCommerce</a> @*and <a href="http://www.getyournet.ch/" target="_blank">getYourNet*@</a>
             </div>
-            <div class="footer-disclaimer">
+            @*<div class="footer-disclaimer">
                 @T("Content.CopyrightNotice", DateTime.Now.Year, Model.StoreName)
-            </div>
-            @if (Model.DisplayTaxShippingInfoFooter)
+            </div>*@
+            @*@if (Model.DisplayTaxShippingInfoFooter)
             {
                 var inclTax = EngineContext.Current.Resolve<IWorkContext>().TaxDisplayType == TaxDisplayType.IncludingTax;
                 <div class="footer-tax-shipping">
@@ -133,7 +136,7 @@
             }
             <div class="footer-store-theme">
                 @Html.Action("StoreThemeSelector", "Common")
-            </div>
+            </div>*@
             @Html.Widget("footer")
         </div>
     </div>

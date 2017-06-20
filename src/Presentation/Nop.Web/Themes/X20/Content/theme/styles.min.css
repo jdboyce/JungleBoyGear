@@ -13041,13 +13041,13 @@ fieldset[disabled] .button-2:hover {
 }
 
 .topic-html-content-title {
-    padding: 0 0 5px
+    /*padding: 0 0 5px*/
 }
 
 .topic-html-content-header {
     font-size: 3.6em;
     font-weight: 100;
-    margin: 0 0 .5em 0
+    /*margin: 0 0 .5em 0*/
 }
 
 @media (max-width:480px) {
@@ -14673,7 +14673,8 @@ ul.opc {
 
 .home-page .topic-html-content-header {
     text-align: center;
-    margin: 1em 0
+    /*margin: 1em 0*/
+    
 }
 
 .bestsellers .title,

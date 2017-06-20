@@ -18,7 +18,8 @@
 }
 <div class="page login-page">
     <div class="page-title">
-        <h1>@T("Account.Login.Welcome")</h1>
+        @*<h1>@T("Account.Login.Welcome")</h1>*@
+        <h1>Welcome, Please Log In</h1>
     </div>
     @Html.Partial("_ExternalAuthentication.AssociateMessage")
     @Html.Partial("_ExternalAuthentication.Errors")
@@ -98,16 +99,20 @@
                         </div>
                         }
                         <div class="buttons">
-                            <input class="button-1 login-button" type="submit" value="@T("Account.Login.LoginButton")" />
+                            @*<input class="button-1 login-button" type="submit" value="@T("Account.Login.LoginButton")" />*@
+                            <input class="button-1 login-button" type="submit" value="Log In" />
+
                         </div>
                        
                     }
                 </div>
+               
             </div>
         </div>
         <div class="external-authentication">
             @Html.Action("ExternalMethods", "ExternalAuthentication")
         </div>
-        @Html.Action("TopicBlock", "Topic", new { systemName = "LoginRegistrationInfo" })
+
+        @*@Html.Action("TopicBlock", "Topic", new { systemName = "LoginRegistrationInfo" })*@
     </div>
 </div>

@@ -26,23 +26,23 @@
         @if (!String.IsNullOrEmpty(url))
         {
             <a href="@url">
-                @if (!String.IsNullOrEmpty(item.ImageUrl))
+                @*@if (!String.IsNullOrEmpty(item.ImageUrl))
                 {
                     <text>
                         <img alt="" src="@Url.Content(item.ImageUrl)" />
                     </text>
-                }
+                }*@
                 @item.Title
             </a>
         }
         else
         {
-            if (!String.IsNullOrEmpty(item.ImageUrl))
+            @*if (!String.IsNullOrEmpty(item.ImageUrl))
             {
                 <text>
                     <img alt="" src="@Url.Content(item.ImageUrl)" />
                 </text>
-            }
+            }*@
             @item.Title
         }
         @if (item.ChildNodes.Any(x => x.Visible))
@@ -60,7 +60,14 @@
 <ul id="admin-menu">
     @foreach (var item in siteMap.RootNode.ChildNodes.Where(x => x.Visible))
     {
-        @RenderMenuItem(item)
+
+        if(item.Title != "Help" && item.Title != "Promotions")
+        {
+           @RenderMenuItem(item)
+        }
+        
+
+
     }
 	@*plugin custom items*@
     @if (adminMenuPlugins.Any())

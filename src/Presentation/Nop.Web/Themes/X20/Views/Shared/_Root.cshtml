@@ -629,12 +629,15 @@
                 </div>
             </div>
         </div>
+  
     }
     @if (config == null || (config != null && !config.disablefooterbottom))
     {
+  
         <div class="master-wrapper-footer">
             @Html.Action("Footer", "Common")
         </div>
+   
     }
     @Html.Action("TopicBlock", "Topic", new { systemName = "CustomFooter" })
 </div>
